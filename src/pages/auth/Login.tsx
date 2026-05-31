@@ -70,18 +70,10 @@ const Login = () => {
       {/* ==================== FORM SIDE ==================== */}
       <div className="flex-1 flex flex-col">
         {/* Header */}
-        <div className="px-8 py-6">
-          <Link to="/" className="flex items-center gap-2 w-fit">
-            <span className="text-[#418FBF] font-bold text-2xl">رفيق</span>
-
-            <div
-              className="w-10 h-10 rounded-xl flex items-center justify-center"
-              style={{
-                background: "linear-gradient(135deg, #2b2196, #00c8c8)",
-              }}
-            >
-              <img src={logo} alt="logo" className="w-6 h-6" />
-            </div>
+        <div className="flex items-center justify-between px-6 md:px-8 pt-6">
+          <Link to="/" className="flex items-center ">
+            <img src={logo} alt="logo" />
+            <span className="text-[#41A2D8] font-bold text-xl">رفيق</span>
           </Link>
         </div>
 
