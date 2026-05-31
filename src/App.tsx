@@ -1,9 +1,8 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import Login from "./pages/auth/Login";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import ForgotPassword from "./pages/auth/ForgotPassword";
+import Login from "./pages/auth/Login";
 import OtpVerification from "./pages/auth/OtpVerification";
 import Dashboard from "./pages/Dashboard";
-import ProtectedRoute from "./components/auth/ProtectedRoute";
 
 const App = () => {
   return (
@@ -12,12 +11,7 @@ const App = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/otp-verification" element={<OtpVerification />} />
-
-        {/* Protected routes */}
-        <Route element={<ProtectedRoute />}>
-          <Route path="/dashboard" element={<Dashboard />} />
-        </Route>
-
+        <Route path="/dashboard" element={<Dashboard />} />
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </BrowserRouter>
