@@ -251,7 +251,7 @@ const Dashboard = () => {
                   </td>
                 </tr>
               ) : (
-                dashboardOrders?.orders?.map((row) => (
+                dashboardOrders?.orders?.map((row: any) => (
                   <tr
                     key={row._id}
                     className="border-b border-gray-50 text-[14px] text-[#000000B2]"
