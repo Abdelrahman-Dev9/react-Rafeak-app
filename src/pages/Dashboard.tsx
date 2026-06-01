@@ -1,4 +1,9 @@
 import Sidebar from "@/components/dashboard/Sidebar";
+import { Spinner } from "@/components/ui/spinner";
+import {
+  useGetDashboardOrdersQuery,
+  useGetDashboardStatsQuery,
+} from "@/redux/service/dashboard/dashboardApi";
 import { useState } from "react";
 import { MdChevronLeft, MdChevronRight } from "react-icons/md";
 import { TiArrowSortedDown } from "react-icons/ti";
@@ -34,37 +39,6 @@ const chartData = [
   { month: "ديسمبر", total: 700, completed: 450, cancelled: 80 },
 ];
 
-const tableData = [
-  {
-    id: "ID #29312BA",
-    date: "24/9/2024, 09:15 AM",
-    requester: "محمد عبد العاطي",
-    volunteer: "محمد اشرف",
-    status: "نشط",
-  },
-  {
-    id: "ID #29312BA",
-    date: "24/9/2024, 09:15 AM",
-    requester: "محمود عبد الفتاح",
-    volunteer: "يوسف شاهين",
-    status: "نشط",
-  },
-  {
-    id: "ID #29312BA",
-    date: "24/9/2024, 09:15 AM",
-    requester: "يوسف شاهين",
-    volunteer: "محمود عبد الفتاح",
-    status: "معلق",
-  },
-  {
-    id: "ID #29312BA",
-    date: "24/9/2024, 09:15 AM",
-    requester: "محمد اشرف",
-    volunteer: "محمد عبد العاطي",
-    status: "ملغى",
-  },
-];
-
 // ==================== Components ====================
 
 const StatusBadge = ({ status }: { status: string }) => {
@@ -72,6 +46,7 @@ const StatusBadge = ({ status }: { status: string }) => {
     نشط: "text-[#14AE5C] border-[#14AE5C]",
     معلق: "text-[#BF6A02] border-[#BF6A02]",
     ملغى: "text-[#CC1D1B] border-[#CC1D1B]",
+    مكتمل: "text-[#225672] border-[#225672]",
   };
 
   return (
@@ -90,6 +65,10 @@ const StatusBadge = ({ status }: { status: string }) => {
 const Dashboard = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const { data: dashboardStats, isLoading: dashboardStatsLoading } =
+    useGetDashboardStatsQuery({});
+  const { data: dashboardOrders, isLoading: dashboardOrdersLoading } =
+    useGetDashboardOrdersQuery({});
 
   const totalPages = 16;
   const pageNumbers = [1, 2, 3, 4];
@@ -117,7 +96,13 @@ const Dashboard = () => {
           <div className="grid grid-cols-5 gap-3">
             <div className="flex flex-col items-start gap-1 p-4 rounded-xl border border-[#E5E3EB]">
               <img src={shop} alt="shop" />
-              <span className="text-[20px] font-bold text-[#225672]">20</span>
+              <span className="text-[20px] font-bold text-[#225672]">
+                {dashboardStatsLoading ? (
+                  <Spinner className="w-6 h-6" />
+                ) : (
+                  dashboardStats?.totals?.totalOrders
+                )}
+              </span>
               <span className="text-[16px] text-[#225672]">
                 إجمالي المساعدة
               </span>
@@ -125,25 +110,49 @@ const Dashboard = () => {
 
             <div className="flex flex-col items-start gap-1 p-4 rounded-xl border border-[#E5E3EB]">
               <img src={clock} alt="shop" />
-              <span className="text-[20px] font-bold text-[#225672]">10</span>
+              <span className="text-[20px] font-bold text-[#225672]">
+                {dashboardStatsLoading ? (
+                  <Spinner className="w-6 h-6" />
+                ) : (
+                  dashboardStats?.totals?.pending
+                )}
+              </span>
               <span className="text-[16px] text-[#225672]">معلق</span>
             </div>
 
             <div className="flex flex-col items-start gap-1 p-4 rounded-xl border border-[#E5E3EB]">
               <img src={blueClock} alt="shop" />
-              <span className="text-[20px] font-bold text-[#225672]">5</span>
+              <span className="text-[20px] font-bold text-[#225672]">
+                {dashboardStatsLoading ? (
+                  <Spinner className="w-6 h-6" />
+                ) : (
+                  dashboardStats?.totals?.accepted
+                )}
+              </span>
               <span className="text-[16px] text-[#225672]">نشط</span>
             </div>
 
             <div className="flex flex-col items-start gap-1 p-4 rounded-xl border border-[#E5E3EB]">
               <img src={right} alt="shop" />
-              <span className="text-[20px] font-bold text-[#225672]">2</span>
+              <span className="text-[20px] font-bold text-[#225672]">
+                {dashboardStatsLoading ? (
+                  <Spinner className="w-6 h-6" />
+                ) : (
+                  dashboardStats?.totals?.completed
+                )}
+              </span>
               <span className="text-[16px] text-[#225672]">مكتمل</span>
             </div>
 
             <div className="flex flex-col items-start gap-1 p-4 rounded-xl border border-[#E5E3EB]">
               <img src={redIcon} alt="shop" />
-              <span className="text-[20px] font-bold text-[#225672]">3</span>
+              <span className="text-[20px] font-bold text-[#225672]">
+                {dashboardStatsLoading ? (
+                  <Spinner className="w-6 h-6" />
+                ) : (
+                  dashboardStats?.totals?.canceled
+                )}
+              </span>
               <span className="text-[16px] text-[#225672]">ملغى</span>
             </div>
           </div>
@@ -211,7 +220,7 @@ const Dashboard = () => {
             قائمة الخدمات
           </h2>
 
-          <table className="w-full text-sm">
+          <table className="w-full table-fixed text-sm">
             <thead>
               <tr className="border-b border-[#E5E3EB]">
                 <th className="text-right pb-3 text-[14px] text-[#000000DE]">
@@ -233,20 +242,56 @@ const Dashboard = () => {
             </thead>
 
             <tbody>
-              {tableData.map((row, index) => (
-                <tr
-                  key={index}
-                  className="border-b border-gray-50 text-[14px] text-[#000000B2]"
-                >
-                  <td>{row.id}</td>
-                  <td>{row.date}</td>
-                  <td>{row.requester}</td>
-                  <td>{row.volunteer}</td>
-                  <td className="py-4">
-                    <StatusBadge status={row.status} />
+              {dashboardOrdersLoading ? (
+                <tr>
+                  <td colSpan={5} className="py-10 text-center">
+                    <div className="flex justify-center">
+                      <Spinner className="w-8 h-8" />
+                    </div>
                   </td>
                 </tr>
-              ))}
+              ) : (
+                dashboardOrders?.orders?.map((row) => (
+                  <tr
+                    key={row._id}
+                    className="border-b border-gray-50 text-[14px] text-[#000000B2]"
+                  >
+                    <td>{row._id}</td>
+
+                    <td>
+                      {new Date(row.createdAt).toLocaleDateString("ar-EG", {
+                        year: "numeric",
+                        month: "2-digit",
+                        day: "2-digit",
+                      })}
+                    </td>
+
+                    <td>
+                      {row.seeker?.firstName} {row.seeker?.lastName}
+                    </td>
+
+                    <td>
+                      {row.volunteer?.firstName} {row.volunteer?.lastName}
+                    </td>
+
+                    <td className="py-4">
+                      <StatusBadge
+                        status={
+                          row.status === "completed"
+                            ? "مكتمل"
+                            : row.status === "accepted"
+                            ? "نشط"
+                            : row.status === "pending"
+                            ? "معلق"
+                            : row.status === "canceled"
+                            ? "ملغى"
+                            : row.status
+                        }
+                      />
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
 
