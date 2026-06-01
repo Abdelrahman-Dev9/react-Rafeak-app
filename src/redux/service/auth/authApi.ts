@@ -23,6 +23,13 @@ export const authApi = baseApi.injectEndpoints({
         body,
       }),
     }),
+    resetPassword: builder.mutation({
+      query: (body) => ({
+        url: "/auth/resetpassword",
+        method: "PUT",
+        body,
+      }),
+    }),
   }),
 });
 
@@ -30,4 +37,5 @@ export const {
   useLoginMutation,
   useForgotPasswordMutation,
   useVerifyCodeMutation,
+  useResetPasswordMutation,
 } = authApi;

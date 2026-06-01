@@ -8,6 +8,7 @@ import Users from "./pages/Users";
 import Admins from "./pages/Admins";
 import Notifications from "./pages/Notifications";
 import Reports from "./pages/Reports";
+import CreateNewPassword from "./pages/auth/CreateNewPassword";
 
 const App = () => {
   return (
@@ -16,6 +17,7 @@ const App = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/otp-verification" element={<OtpVerification />} />
+        <Route path="/create-new-password" element={<CreateNewPassword />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/tracking" element={<TrackingList />} />
         <Route path="/users" element={<Users />} />

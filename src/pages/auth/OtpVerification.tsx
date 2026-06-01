@@ -53,7 +53,7 @@ const OtpVerification = () => {
 
       alert(res.message || "Code verified successfully");
 
-      navigate("/reset-password");
+      navigate("/create-new-password");
     } catch (error: any) {
       alert(error?.data?.message || error?.message || "Something went wrong");
     }
