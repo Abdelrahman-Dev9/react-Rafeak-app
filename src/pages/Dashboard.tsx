@@ -1,25 +1,285 @@
-import { useNavigate } from "react-router-dom";
+import Sidebar from "@/components/dashboard/Sidebar";
+import { useState } from "react";
+import { MdChevronLeft, MdChevronRight } from "react-icons/md";
+import { TiArrowSortedDown } from "react-icons/ti";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
+import blueClock from "../assets/blue-clock.png";
+import clock from "../assets/clock.png";
+import redIcon from "../assets/red-icon.svg";
+import right from "../assets/right.png";
+import shop from "../assets/shop.png";
 
-const Dashboard = () => {
-  const navigate = useNavigate();
+// ==================== Data ====================
 
-  const handleLogout = () => {
-    navigate("/login");
+const chartData = [
+  { month: "يناير", total: 1200, completed: 800, cancelled: 150 },
+  { month: "فبراير", total: 1800, completed: 1200, cancelled: 200 },
+  { month: "مارس", total: 900, completed: 600, cancelled: 100 },
+  { month: "أبريل", total: 2200, completed: 1500, cancelled: 300 },
+  { month: "مايو", total: 1600, completed: 1000, cancelled: 180 },
+  { month: "يونيو", total: 2800, completed: 1900, cancelled: 350 },
+  { month: "يوليو", total: 2100, completed: 1400, cancelled: 260 },
+  { month: "أغسطس", total: 1400, completed: 950, cancelled: 170 },
+  { month: "سبتمبر", total: 1900, completed: 1300, cancelled: 220 },
+  { month: "أكتوبر", total: 2500, completed: 1700, cancelled: 400 },
+  { month: "نوفمبر", total: 1100, completed: 750, cancelled: 130 },
+  { month: "ديسمبر", total: 700, completed: 450, cancelled: 80 },
+];
+
+const tableData = [
+  {
+    id: "ID #29312BA",
+    date: "24/9/2024, 09:15 AM",
+    requester: "محمد عبد العاطي",
+    volunteer: "محمد اشرف",
+    status: "نشط",
+  },
+  {
+    id: "ID #29312BA",
+    date: "24/9/2024, 09:15 AM",
+    requester: "محمود عبد الفتاح",
+    volunteer: "يوسف شاهين",
+    status: "نشط",
+  },
+  {
+    id: "ID #29312BA",
+    date: "24/9/2024, 09:15 AM",
+    requester: "يوسف شاهين",
+    volunteer: "محمود عبد الفتاح",
+    status: "معلق",
+  },
+  {
+    id: "ID #29312BA",
+    date: "24/9/2024, 09:15 AM",
+    requester: "محمد اشرف",
+    volunteer: "محمد عبد العاطي",
+    status: "ملغى",
+  },
+];
+
+// ==================== Components ====================
+
+const StatusBadge = ({ status }: { status: string }) => {
+  const styles: Record<string, string> = {
+    نشط: "text-[#14AE5C] border-[#14AE5C]",
+    معلق: "text-[#BF6A02] border-[#BF6A02]",
+    ملغى: "text-[#CC1D1B] border-[#CC1D1B]",
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
-      <div className="bg-white rounded-2xl shadow p-10 text-center max-w-sm w-full">
-        <h1 className="text-2xl font-bold text-[#2b2196] mb-2">لوحة التحكم</h1>
-        <p className="text-gray-500 mb-6">أهلاً، مرحباً بك في لوحة التحكم</p>
-        <button
-          onClick={handleLogout}
-          className="px-6 py-2 rounded-lg text-white text-sm font-medium hover:opacity-90 transition"
-          style={{ background: "linear-gradient(90deg, #00c8c8, #00b0b0)" }}
-        >
-          تسجيل الخروج
-        </button>
-      </div>
+    <span
+      className={`px-4 py-1 rounded-full border text-sm font-medium ${
+        styles[status] ?? ""
+      }`}
+    >
+      {status}
+    </span>
+  );
+};
+
+// ==================== Dashboard ====================
+
+const Dashboard = () => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+
+  const totalPages = 16;
+  const pageNumbers = [1, 2, 3, 4];
+
+  return (
+    <div className="min-h-screen flex bg-gray-100 font-sans">
+      {/* Sidebar */}
+      <Sidebar
+        isOpen={isSidebarOpen}
+        toggleSidebar={() => setIsSidebarOpen((prev) => !prev)}
+      />
+
+      {/* Main Content */}
+      <main
+        className={`flex-1 p-6 flex flex-col gap-5 transition-all duration-300 ${
+          isSidebarOpen ? "mr-56" : "mr-20"
+        }`}
+      >
+        {/* Stats */}
+        <section className="bg-white rounded-2xl p-5 shadow-sm">
+          <h2 className="text-[22px] font-semibold text-[#418FBF] mb-4 text-right">
+            نظرة عامة على الخدمة
+          </h2>
+
+          <div className="grid grid-cols-5 gap-3">
+            <div className="flex flex-col items-start gap-1 p-4 rounded-xl border border-[#E5E3EB]">
+              <img src={shop} alt="shop" />
+              <span className="text-[20px] font-bold text-[#225672]">20</span>
+              <span className="text-[16px] text-[#225672]">
+                إجمالي المساعدة
+              </span>
+            </div>
+
+            <div className="flex flex-col items-start gap-1 p-4 rounded-xl border border-[#E5E3EB]">
+              <img src={clock} alt="shop" />
+              <span className="text-[20px] font-bold text-[#225672]">10</span>
+              <span className="text-[16px] text-[#225672]">معلق</span>
+            </div>
+
+            <div className="flex flex-col items-start gap-1 p-4 rounded-xl border border-[#E5E3EB]">
+              <img src={blueClock} alt="shop" />
+              <span className="text-[20px] font-bold text-[#225672]">5</span>
+              <span className="text-[16px] text-[#225672]">نشط</span>
+            </div>
+
+            <div className="flex flex-col items-start gap-1 p-4 rounded-xl border border-[#E5E3EB]">
+              <img src={right} alt="shop" />
+              <span className="text-[20px] font-bold text-[#225672]">2</span>
+              <span className="text-[16px] text-[#225672]">مكتمل</span>
+            </div>
+
+            <div className="flex flex-col items-start gap-1 p-4 rounded-xl border border-[#E5E3EB]">
+              <img src={redIcon} alt="shop" />
+              <span className="text-[20px] font-bold text-[#225672]">3</span>
+              <span className="text-[16px] text-[#225672]">ملغى</span>
+            </div>
+          </div>
+        </section>
+
+        {/* Chart */}
+        <section className="bg-white rounded-2xl p-5 shadow-sm">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-[22px] font-bold text-[#418FBF]">
+              إحصائيات المساعدة
+            </h2>
+
+            <div className="flex items-center gap-6">
+              {/* إجمالي المساعدة */}
+              <div className="flex items-center gap-2">
+                <div className="w-10 h-5 rounded-full bg-[#225672]" />
+                <span className="text-[14px] font-bold text-[#000000B2]">
+                  إجمالي المساعدة
+                </span>
+              </div>
+
+              {/* مكتمل */}
+              <div className="flex items-center gap-2">
+                <div className="w-10 h-5 rounded-full bg-[#B4B0BF]" />
+                <span className="text-[14px] font-bold text-[#000000B2]">
+                  مكتمل
+                </span>
+              </div>
+
+              {/* ملغى */}
+              <div className="flex items-center gap-2">
+                <div className="w-10 h-5 rounded-full bg-[#EEECF2]" />
+                <span className="text-[14px] font-bold text-[#000000B2]">
+                  ملغى
+                </span>
+              </div>
+
+              {/* السنة */}
+              <button className=" border border-[#E5E3EB]rounded-[10px] h-10 px-4 flex items-center gap-2 hover:bg-gray-50 transition-colors cursor-pointer">
+                <TiArrowSortedDown className="text-[#418FBF]" />
+                <span className="text-[12px] text-[#418FBF]">عام 2024</span>
+              </button>
+            </div>
+          </div>
+          {/** Bar chart */}
+          <div dir="ltr">
+            <ResponsiveContainer width="100%" height={250}>
+              <BarChart data={[...chartData].reverse()}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="month" />
+                <YAxis />
+                <Tooltip />
+
+                <Bar dataKey="total" fill="#225672" />
+                <Bar dataKey="completed" fill="#B4B0BF" />
+                <Bar dataKey="cancelled" fill="#EEECF2" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </section>
+
+        {/* Table */}
+        <section className="bg-white rounded-2xl p-5 shadow-sm">
+          <h2 className="text-[22px] font-bold text-[#418FBF] mb-4">
+            قائمة الخدمات
+          </h2>
+
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-[#E5E3EB]">
+                <th className="text-right pb-3 text-[14px] text-[#000000DE]">
+                  معرف الخدمة
+                </th>
+                <th className="text-[14px] text-[#000000DE] text-right pb-3">
+                  تاريخ الخدمه
+                </th>
+                <th className="text-[14px] text-[#000000DE] text-right pb-3">
+                  اسم طالب الخدمة
+                </th>
+                <th className="text-[14px] text-[#000000DE] text-right pb-3">
+                  اسم المتطوع
+                </th>
+                <th className="text-[14px] text-[#000000DE] text-right pb-3">
+                  حالة الخدمه
+                </th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {tableData.map((row, index) => (
+                <tr
+                  key={index}
+                  className="border-b border-gray-50 text-[14px] text-[#000000B2]"
+                >
+                  <td>{row.id}</td>
+                  <td>{row.date}</td>
+                  <td>{row.requester}</td>
+                  <td>{row.volunteer}</td>
+                  <td className="py-4">
+                    <StatusBadge status={row.status} />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          {/* Pagination */}
+          <div className="flex items-center gap-1 mt-5" dir="ltr">
+            <button
+              onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+            >
+              <MdChevronLeft />
+            </button>
+
+            {pageNumbers.map((page) => (
+              <button
+                key={page}
+                onClick={() => setCurrentPage(page)}
+                className={`w-8 h-8 rounded-lg ${
+                  currentPage === page ? "bg-[#41A2D8] text-white" : "border"
+                }`}
+              >
+                {page}
+              </button>
+            ))}
+
+            <button
+              onClick={() =>
+                setCurrentPage((prev) => Math.min(totalPages, prev + 1))
+              }
+            >
+              <MdChevronRight />
+            </button>
+          </div>
+        </section>
+      </main>
     </div>
   );
 };
