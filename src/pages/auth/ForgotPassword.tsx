@@ -38,9 +38,9 @@ const ForgotPassword = () => {
   const onSubmit = async ({ email }: FormData) => {
     try {
       const res = await forgotPassword({ email }).unwrap();
-
       alert(res.message);
 
+      localStorage.setItem("token", res.token);
       navigate("/otp-verification", {
         state: { email },
       });
@@ -58,7 +58,7 @@ const ForgotPassword = () => {
             <span className="text-[#41A2D8] font-bold text-xl">رفيق</span>
           </Link>
 
-          <p className="text-sm text-[#111827]">
+          <p className="text-[14px] text-[#111827]">
             هل لديك حساب بالفعل؟
             <Link
               to="/login"

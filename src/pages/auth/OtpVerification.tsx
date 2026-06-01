@@ -1,136 +1,190 @@
-import { useRef, useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
+import { useVerifyCodeMutation } from "@/redux/service/auth/authApi";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm, useWatch } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
+import { z } from "zod";
+import blueLook from "../../assets/blueLook.png";
+import logo from "../../assets/logo.png";
+import mailImage from "../../assets/mail.png";
+
+const otpSchema = z.object({
+  resetCode: z
+    .string()
+    .min(6, "يجب إدخال رمز مكون من 6 أرقام")
+    .max(6, "يجب إدخال رمز مكون من 6 أرقام"),
+});
+
+type OtpFormValues = z.infer<typeof otpSchema>;
 
 const OtpVerification = () => {
-  const [otp, setOtp] = useState(Array(6).fill(""));
-  const inputs = useRef<(HTMLInputElement | null)[]>([]);
   const navigate = useNavigate();
+  const [verifyCode, { isLoading }] = useVerifyCodeMutation();
 
-  const handleChange = (index: number, value: string) => {
-    if (!/^\d?$/.test(value)) return;
-    const next = [...otp];
-    next[index] = value;
-    setOtp(next);
-    if (value && index < 5) inputs.current[index + 1]?.focus();
-  };
+  const form = useForm<OtpFormValues>({
+    resolver: zodResolver(otpSchema),
+    defaultValues: {
+      resetCode: "",
+    },
+  });
 
-  const handleKeyDown = (index: number, e: React.KeyboardEvent) => {
-    if (e.key === "Backspace" && !otp[index] && index > 0) {
-      inputs.current[index - 1]?.focus();
+  const otpValue = useWatch({
+    control: form.control,
+    name: "resetCode",
+  });
+
+  const onSubmit = async (data: OtpFormValues) => {
+    try {
+      const res = await verifyCode({
+        resetCode: data.resetCode,
+      }).unwrap();
+
+      alert(res.message || "Code verified successfully");
+
+      navigate("/reset-password");
+    } catch (error: any) {
+      alert(error?.data?.message || error?.message || "Something went wrong");
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    navigate("/login");
-  };
-
   return (
-    <div>
-      {/* Header */}
-      <div className="flex items-center justify-between px-8 pt-6">
-        <p className="text-sm text-gray-500">
-          لديك حساب بالفعل؟{" "}
-          <Link
-            to="/login"
-            className="text-[#2b2196] font-medium hover:underline"
-          >
-            تسجيل الدخول
+    <div className="h-screen overflow-hidden grid lg:grid-cols-2">
+      {/* Form Section */}
+      <div className="flex flex-col justify-between p-6 lg:p-10">
+        <header className="flex items-center justify-between">
+          <Link to="/" className="flex items-center gap-2">
+            <img src={logo} alt="logo" />
+            <span className="text-[#41A2D8] font-bold text-xl">رفيق</span>
           </Link>
-        </p>
-        <Link to="/" className="flex items-center gap-2">
-          <span className="text-[#2b2196] font-bold text-xl">زفيق</span>
-          <div
-            className="w-8 h-8 rounded-lg flex items-center justify-center"
-            style={{ background: "linear-gradient(135deg, #2b2196, #00c8c8)" }}
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="white">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z" />
-            </svg>
-          </div>
-        </Link>
-      </div>
 
-      {/* Form */}
-      <div className="flex-1 flex flex-col items-center justify-center px-8 py-10">
-        <div className="w-full max-w-md">
-          <div className="flex justify-center mb-6">
-            <div
-              className="w-20 h-20 rounded-full flex items-center justify-center"
-              style={{
-                background: "linear-gradient(135deg, #e8f4ff, #d0e8ff)",
-              }}
+          <p className="text-[14px] text-[#111827]">
+            هل لديك حساب بالفعل؟
+            <Link
+              to="/login"
+              className="text-[#41A2D8] font-medium border-b border-[#41A2D8]"
             >
-              <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
-                <path
-                  d="M18 3 L32 10 L32 22 Q32 31 18 34 Q4 31 4 22 L4 10 Z"
-                  fill="#2b2196"
-                  fillOpacity="0.15"
-                  stroke="#2b2196"
-                  strokeWidth="2"
-                />
-                <path
-                  d="M11 18 l5 5 l9-9"
-                  stroke="#2b2196"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </div>
-          </div>
-
-          <h1 className="text-2xl font-bold text-gray-800 text-center mb-2">
-            التحقق من الرمز
-          </h1>
-          <p className="text-gray-500 text-sm text-center mb-8">
-            أدخل الرمز المكون من 6 أرقام الذي تم إرساله إلى بريدك الإلكتروني
+              تسجيل الدخول
+            </Link>
           </p>
+        </header>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* OTP inputs — reversed for RTL display left-to-right visually */}
-            <div className="flex gap-3 justify-center" dir="ltr">
-              {otp.map((digit, i) => (
-                <input
-                  key={i}
-                  ref={(el) => {
-                    inputs.current[i] = el;
-                  }}
-                  type="text"
-                  inputMode="numeric"
-                  maxLength={1}
-                  value={digit}
-                  onChange={(e) => handleChange(i, e.target.value)}
-                  onKeyDown={(e) => handleKeyDown(i, e)}
-                  className="w-11 h-12 text-center text-lg font-bold border-2 border-gray-200 rounded-lg outline-none focus:border-[#2b2196] transition"
-                />
-              ))}
+        <main className="flex flex-1 items-center justify-center">
+          <div className="w-full max-w-md">
+            <div className="flex flex-col items-center">
+              <img src={mailImage} alt="mailImage" />
+
+              <h1 className="text-[32px] font-bold text-[#41A2D8]">
+                تحقق من بريدك الإلكتروني
+              </h1>
+
+              <p className="mt-2 text-center text-[16px] text-[#374151]">
+                أدخل الرمز الذي تم إرساله إلى البريد الإلكتروني:
+                ahmedr**@gmail.com
+              </p>
             </div>
 
-            <button
-              type="submit"
-              className="w-full py-3 rounded-lg text-white font-semibold text-sm transition hover:opacity-90"
-              style={{ background: "linear-gradient(90deg, #00c8c8, #00b0b0)" }}
-            >
-              تأكيد
-            </button>
-          </form>
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="mt-8 space-y-6"
+              >
+                <FormField
+                  control={form.control}
+                  name="resetCode"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <div className="flex justify-center">
+                          <InputOTP
+                            maxLength={6}
+                            value={field.value}
+                            onChange={(value) => {
+                              // ✅ ensure string always
+                              const code = Array.isArray(value)
+                                ? value.join("")
+                                : String(value);
 
-          <p className="text-center text-sm text-gray-500 mt-5">
-            لم يصلك الرمز؟{" "}
-            <button className="text-[#2b2196] font-medium hover:underline">
-              إعادة الإرسال
-            </button>
-          </p>
-        </div>
+                              field.onChange(code.replace(/\s/g, ""));
+                            }}
+                          >
+                            <InputOTPGroup dir="ltr" className="flex gap-3">
+                              <InputOTPSlot
+                                index={0}
+                                className="h-14 w-14 rounded-[8px] border-2 text-xl border-[#3A95D2] font-semibold data-[active=true]:border-[#3A95D2] data-[active=true]:ring-0"
+                              />
+                              <InputOTPSlot
+                                index={1}
+                                className="h-14 w-14 rounded-[8px] border-2 text-xl border-[#3A95D2] font-semibold data-[active=true]:border-[#3A95D2] data-[active=true]:ring-0"
+                              />
+                              <InputOTPSlot
+                                index={2}
+                                className="h-14 w-14 rounded-[8px] border-2 text-xl border-[#3A95D2] font-semibold data-[active=true]:border-[#3A95D2] data-[active=true]:ring-0"
+                              />
+                              <InputOTPSlot
+                                index={3}
+                                className="h-14 w-14 rounded-[8px] border-2 text-xl border-[#3A95D2] font-semibold data-[active=true]:border-[#3A95D2] data-[active=true]:ring-0"
+                              />
+                              <InputOTPSlot
+                                index={4}
+                                className="h-14 w-14 rounded-[8px] border-2 text-xl border-[#3A95D2] font-semibold data-[active=true]:border-[#3A95D2] data-[active=true]:ring-0"
+                              />
+                              <InputOTPSlot
+                                index={5}
+                                className="h-14 w-14 rounded-[8px] border-2 text-xl border-[#3A95D2] font-semibold data-[active=true]:border-[#3A95D2] data-[active=true]:ring-0"
+                              />
+                            </InputOTPGroup>
+                          </InputOTP>
+                        </div>
+                      </FormControl>
+
+                      <FormMessage className="text-center" />
+                    </FormItem>
+                  )}
+                />
+
+                <Button
+                  type="submit"
+                  className="w-full h-12 text-[16px] bg-[#41A2D8] text-[#FFFFFF] cursor-pointer hover:bg-[#41A2D8]"
+                  disabled={(otpValue?.length ?? 0) !== 6}
+                >
+                  {isLoading
+                    ? "جاري إعادة تعيين كلمة المرور..."
+                    : "إعادة تعيين كلمة المرور"}
+                </Button>
+              </form>
+            </Form>
+
+            <footer className="text-center text-[16px] font-semibold text-[#111827] text-muted-foreground mt-40">
+              تم الإنشاء بواسطة فريق رفيق
+              <br />
+              <span className="text-[#41A2D8] font-normal border-b border-[#41A2D8] cursor-pointer">
+                تواصل معنا
+              </span>
+            </footer>
+          </div>
+        </main>
       </div>
 
-      <p className="text-center text-xs text-gray-400 pb-6">
-        تم الإنشاء بواسطة فريق رفيق •{" "}
-        <a href="#" className="text-[#2b2196] hover:underline">
-          تواصل معنا
-        </a>
-      </p>
+      {/* Image Section */}
+      <div className="hidden lg:flex items-center justify-center bg-muted p-20">
+        <img
+          src={blueLook}
+          alt="OTP Verification"
+          className="h-full w-full object-cover"
+        />
+      </div>
     </div>
   );
 };

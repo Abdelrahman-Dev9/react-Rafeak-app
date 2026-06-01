@@ -16,7 +16,18 @@ export const authApi = baseApi.injectEndpoints({
         body,
       }),
     }),
+    verifyCode: builder.mutation({
+      query: (body) => ({
+        url: "/auth/verifycode",
+        method: "POST",
+        body,
+      }),
+    }),
   }),
 });
 
-export const { useLoginMutation, useForgotPasswordMutation } = authApi;
+export const {
+  useLoginMutation,
+  useForgotPasswordMutation,
+  useVerifyCodeMutation,
+} = authApi;
