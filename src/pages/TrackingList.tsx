@@ -106,7 +106,7 @@ const TrackingList = () => {
                 No orders found
               </div>
             ) : (
-              orders.map((item, i) => (
+              orders.map((item: any, i: any) => (
                 <button
                   key={item._id}
                   onClick={() => setSelectedIndex(i)}
