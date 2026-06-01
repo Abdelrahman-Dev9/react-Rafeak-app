@@ -44,21 +44,29 @@ const FieldRow = ({ label, value }: { label: string; value?: string }) => (
   </div>
 );
 
-// ==================== Main ====================
+// ==================== MAIN ====================
 
 const TrackingList = () => {
   const [selectedIndex, setSelectedIndex] = useState(0);
 
+  // ✅ Orders list
   const { data: ordersResponse, isLoading: isOrdersLoading } =
     useGetOrdersQuery({});
 
-  const { data: orderResponse } = useGetOrderByIdQuery(
-    "69dac4caae4ce9d0a3c17257"
-  );
-  // console.log(orderResponse);
-
   const orders = ordersResponse?.orders ?? [];
-  const selected = orders[selectedIndex] || null;
+
+  // ✅ FIX: dynamic selected ID
+  const selectedOrderId = orders[selectedIndex]?._id;
+
+  // ✅ FIX: dynamic fetch with skip (IMPORTANT)
+  const { data: orderResponse } = useGetOrderByIdQuery(
+    selectedOrderId as string,
+    {
+      skip: !selectedOrderId,
+    }
+  );
+
+  const selected = orderResponse?.order;
 
   return (
     <DashboardLayout>
@@ -91,7 +99,7 @@ const TrackingList = () => {
           <div className="flex-1 overflow-y-auto divide-y divide-gray-50">
             {isOrdersLoading ? (
               <div className="flex justify-center items-center h-full">
-                <Spinner className="w-8 h-8" />
+                <Spinner />
               </div>
             ) : orders.length === 0 ? (
               <div className="flex justify-center items-center h-full text-gray-400 text-sm">
@@ -135,11 +143,7 @@ const TrackingList = () => {
             <div className="flex items-center justify-between">
               <StatusBadge
                 status={
-                  selected ? (
-                    statusMap[selected.status] || selected.status
-                  ) : (
-                    <Spinner />
-                  )
+                  selected ? statusMap[selected.status] || selected.status : ""
                 }
               />
 
@@ -151,7 +155,7 @@ const TrackingList = () => {
                     ID {selected._id}
                   </span>
                 ) : (
-                  <Spinner className="text-[#418FBF]" />
+                  <Spinner />
                 )}
               </div>
             </div>
@@ -165,7 +169,7 @@ const TrackingList = () => {
 
             <div className="flex items-start gap-5">
               <img
-                src={orderResponse?.order?.seeker?.profileImg || avatar}
+                src={selected?.volunteer?.profileImg || avatar}
                 className="w-[250px] h-[288px] rounded-[10px] object-contain border border-gray-200 p-4"
               />
 
@@ -174,10 +178,11 @@ const TrackingList = () => {
                   <FieldRow
                     label="اسم المتطوع"
                     value={
-                      orderResponse?.order?.seeker?.firstName +
-                        " " +
-                        orderResponse?.order?.seeker?.lastName ||
-                      selected?.volunteer?.name
+                      selected?.volunteer
+                        ? `${selected.volunteer.firstName || ""} ${
+                            selected.volunteer.lastName || ""
+                          }`
+                        : ""
                     }
                   />
                 </div>
@@ -185,34 +190,25 @@ const TrackingList = () => {
                 <div className="border rounded-[10px] p-3">
                   <FieldRow
                     label="البريد الإلكتروني"
-                    value={
-                      orderResponse?.order?.seeker?.email ||
-                      selected?.volunteer?.email
-                    }
+                    value={selected?.volunteer?.email}
                   />
                 </div>
 
                 <div className="border rounded-[10px] p-3">
                   <FieldRow
                     label="هاتف المستخدم"
-                    value={
-                      orderResponse?.order?.seeker?.phone ||
-                      selected?.volunteer?.phone
-                    }
+                    value={selected?.volunteer?.phone}
                   />
                 </div>
 
-                {/* 🔥 NEW FIELDS ADDED */}
                 <div className="flex gap-3">
                   <div className="flex-1 border rounded-[10px] p-3">
                     <FieldRow
                       label="تاريخ الميلاد"
                       value={
-                        orderResponse?.order?.seeker?.birthday ||
-                        selected?.volunteer?.birthdate
+                        selected?.volunteer?.birthday
                           ? new Date(
-                              orderResponse?.order?.seeker?.birthday ||
-                                selected?.volunteer?.birthdate
+                              selected.volunteer.birthday
                             ).toLocaleDateString()
                           : ""
                       }
@@ -222,10 +218,7 @@ const TrackingList = () => {
                   <div className="flex-1 border rounded-[10px] p-3">
                     <FieldRow
                       label="الجنس"
-                      value={
-                        orderResponse?.order?.seeker?.gender ||
-                        selected?.volunteer?.gender
-                      }
+                      value={selected?.volunteer?.gender}
                     />
                   </div>
                 </div>
@@ -248,10 +241,11 @@ const TrackingList = () => {
                   <FieldRow
                     label="اسم الباحث"
                     value={
-                      orderResponse?.order?.volunteer?.firstName +
-                        " " +
-                        orderResponse?.order?.volunteer?.lastName ||
-                      selected?.volunteer?.name
+                      selected?.seeker
+                        ? `${selected.seeker.firstName || ""} ${
+                            selected.seeker.lastName || ""
+                          }`
+                        : ""
                     }
                   />
                 </div>
@@ -259,21 +253,14 @@ const TrackingList = () => {
                 <div className="border rounded-[10px] p-3">
                   <FieldRow
                     label="البريد الإلكتروني"
-                    value={
-                      orderResponse?.order?.volunteer?.email ||
-                      selected?.volunteer?.email
-                    }
+                    value={selected?.seeker?.email}
                   />
                 </div>
 
-                {/* 🔥 NEW FIELDS ADDED */}
                 <div className="border rounded-[10px] p-3">
                   <FieldRow
                     label="هاتف الباحث"
-                    value={
-                      orderResponse?.order?.volunteer?.phone ||
-                      selected?.volunteer?.phone
-                    }
+                    value={selected?.seeker?.phone}
                   />
                 </div>
 
@@ -282,11 +269,9 @@ const TrackingList = () => {
                     <FieldRow
                       label="تاريخ الميلاد"
                       value={
-                        orderResponse?.order?.volunteer?.birthday ||
-                        selected?.volunteer?.birthdate
+                        selected?.seeker?.birthday
                           ? new Date(
-                              orderResponse?.order?.volunteer?.birthday ||
-                                selected?.volunteer?.birthdate
+                              selected.seeker.birthday
                             ).toLocaleDateString()
                           : ""
                       }
@@ -294,13 +279,7 @@ const TrackingList = () => {
                   </div>
 
                   <div className="flex-1 border rounded-[10px] p-3">
-                    <FieldRow
-                      label="الجنس"
-                      value={
-                        orderResponse?.order?.volunteer?.gender ||
-                        selected?.volunteer?.gender
-                      }
-                    />
+                    <FieldRow label="الجنس" value={selected?.seeker?.gender} />
                   </div>
                 </div>
               </div>
@@ -310,11 +289,14 @@ const TrackingList = () => {
           {/* Request Details */}
           <div className="bg-white rounded-2xl p-5 shadow-sm space-y-3">
             <div className="border rounded-[10px] p-3">
-              <FieldRow label="الإصابة" value={selected?.injury} />
+              <FieldRow label="الإصابة" value={"اصابة ف قدمه اليسري"} />
             </div>
 
             <div className="border rounded-[10px] p-3 mt-5">
-              <FieldRow label="نوع المساعدة" value={selected?.helpType} />
+              <FieldRow
+                label="نوع المساعدة"
+                value={"أحتاج مساعدة للوصول إلى قاعة المحاضرات في مبنى العلوم."}
+              />
             </div>
           </div>
         </div>
