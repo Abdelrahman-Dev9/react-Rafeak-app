@@ -33,10 +33,10 @@ const UserSection = ({
   statusLabel,
   defaultOpen = true,
 }: any) => {
-  const [open, setOpen] = useState(defaultOpen);
+  const [open, setOpen] = useState<boolean>(defaultOpen);
   const [search, setSearch] = useState("");
 
-  const filtered = rows.filter((r: any) =>
+  const filtered = (rows || []).filter((r: any) =>
     `${r.name} ${r.phone}`.includes(search)
   );
 
