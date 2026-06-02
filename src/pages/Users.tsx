@@ -1,125 +1,104 @@
 import { useState } from "react";
 import { MdKeyboardArrowDown, MdKeyboardArrowUp } from "react-icons/md";
 import { RiSearchLine } from "react-icons/ri";
-
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import avatar from "../assets/avatar.png";
-
-// ==================== Types ====================
-
-type UserStatus = "نشط" | "قيد الانتظار";
-
-interface UserRow {
-  name: string;
-  phone: string;
-  gender: string;
-  status: UserStatus;
-}
-
-// ==================== Data ====================
-
-const volunteers: UserRow[] = [
-  { name: "دارلين روبرتسون", phone: "(+20) 123 45678910", gender: "ذكر",  status: "نشط"          },
-  { name: "تيريزا كوبر",     phone: "(+20) 123 45678910", gender: "أنثى", status: "قيد الانتظار" },
-  { name: "جيرالدين فيليبس", phone: "(+20) 123 45678910", gender: "ذكر",  status: "قيد الانتظار" },
-  { name: "ناتالي ستيوارت",  phone: "(+20) 123 45678910", gender: "ذكر",  status: "نشط"          },
-];
-
-const seekers: UserRow[] = [
-  { name: "دارلين روبرتسون", phone: "(+20) 123 45678910", gender: "ذكر",  status: "نشط"          },
-  { name: "تيريزا كوبر",     phone: "(+20) 123 45678910", gender: "أنثى", status: "قيد الانتظار" },
-  { name: "جيرالدين فيليبس", phone: "(+20) 123 45678910", gender: "ذكر",  status: "قيد الانتظار" },
-  { name: "ناتالي ستيوارت",  phone: "(+20) 123 45678910", gender: "ذكر",  status: "قيد الانتظار" },
-];
+import { useGetUsersQuery } from "@/redux/service/users/usersApi";
+import { Spinner } from "@/components/ui/spinner";
 
 // ==================== Helpers ====================
 
-const statusStyle: Record<UserStatus, string> = {
-  "نشط":          "text-green-600  border-green-500",
+const statusStyle = {
+  نشط: "text-green-600 border-green-500",
   "قيد الانتظار": "text-orange-500 border-orange-400",
 };
 
-const StatusBadge = ({ status }: { status: UserStatus }) => (
-  <span className={`px-6 py-1 rounded-full border text-sm font-medium ${statusStyle[status]}`}>
-    {status}
+const StatusBadge = ({ status }) => (
+  <span
+    className={`px-6 py-1 rounded-full border text-sm font-medium ${
+      statusStyle[status] || "text-gray-500 border-gray-300"
+    }`}
+  >
+    {status || "-"}
   </span>
 );
 
-// ==================== Section Component ====================
+// ==================== Section ====================
 
-interface SectionProps {
-  title: string;
-  count: number;
-  rows: UserRow[];
-  nameLabel: string;
-  statusLabel: string;
-  defaultOpen?: boolean;
-}
-
-const UserSection = ({ title, count, rows, nameLabel, statusLabel, defaultOpen = true }: SectionProps) => {
+const UserSection = ({
+  title,
+  count,
+  rows,
+  nameLabel,
+  statusLabel,
+  defaultOpen = true,
+}) => {
   const [open, setOpen] = useState(defaultOpen);
   const [search, setSearch] = useState("");
 
-  const filtered = rows.filter(
-    (r) => r.name.includes(search) || r.phone.includes(search)
-  );
+  const filtered = rows.filter((r) => `${r.name} ${r.phone}`.includes(search));
 
   return (
     <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
       {/* Header */}
       <div className="flex items-center gap-3 px-5 py-4">
-        <button
-          onClick={() => setOpen((o) => !o)}
-          className="w-8 h-8 rounded-full bg-gray-700 text-white flex items-center justify-center shrink-0 cursor-pointer hover:bg-gray-600 transition-colors"
-        >
-          {open ? <MdKeyboardArrowUp size={20} /> : <MdKeyboardArrowDown size={20} />}
-        </button>
+        <h2 className="text-[22px] font-semibold text-[#418FBF] shrink-0">
+          {title} ({count})
+        </h2>
 
         <div className="relative flex-1">
-          <RiSearchLine className="absolute top-1/2 -translate-y-1/2 right-3 text-gray-400" />
+          <RiSearchLine className="absolute top-1/2 -translate-y-1/2 right-3" />
+
           <input
-            type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="ابحث عن الاسم أو رقم الهاتف"
-            className="w-full pr-9 pl-3 py-2 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-[#418FBF] text-right"
+            className="w-full pr-9 pl-3 py-2 border rounded-xl text-right"
           />
         </div>
 
-        <h2 className="text-lg font-bold text-gray-800 shrink-0">
-          {title} ({count})
-        </h2>
+        <button
+          onClick={() => setOpen((o) => !o)}
+          className="w-8 h-8 rounded-full bg-[#225672] text-white flex items-center justify-center"
+        >
+          {open ? <MdKeyboardArrowUp /> : <MdKeyboardArrowDown />}
+        </button>
       </div>
 
       {/* Table */}
       {open && (
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-t border-b border-gray-100">
-              <th className="text-right py-3 px-5 font-semibold text-gray-500">{statusLabel}</th>
-              <th className="text-right py-3 px-5 font-semibold text-gray-500">النوع</th>
-              <th className="text-right py-3 px-5 font-semibold text-gray-500">رقم الهاتف</th>
-              <th className="text-right py-3 px-5 font-semibold text-gray-500">{nameLabel}</th>
+            <tr className="border-y text-gray-500">
+              <th className="text-right p-3">{nameLabel}</th>
+              <th className="text-right p-3">رقم الهاتف</th>
+              <th className="text-right p-3">النوع</th>
+              <th className="text-right p-3">{statusLabel}</th>
             </tr>
           </thead>
+
           <tbody>
             {filtered.map((row, i) => (
               <tr
-                key={i}
-                className={`border-b border-gray-50 transition-colors ${
-                  i % 2 === 1 ? "bg-gray-50" : "bg-white"
-                }`}
+                key={row._id || i}
+                className={i % 2 ? "bg-gray-50" : "bg-white"}
               >
-                <td className="py-4 px-5">
-                  <StatusBadge status={row.status} />
-                </td>
-                <td className="py-4 px-5 text-gray-600">{row.gender}</td>
-                <td className="py-4 px-5 text-gray-600">{row.phone}</td>
-                <td className="py-4 px-5">
-                  <div className="flex items-center gap-2 justify-end">
-                    <span className="text-gray-700 font-medium">{row.name}</span>
-                    <img src={avatar} alt={row.name} className="w-8 h-8 rounded-full object-cover shrink-0" />
+                {/* NAME */}
+                <td className="p-3">
+                  <div className="flex items-center gap-2">
+                    <img
+                      src={row.avatar || avatar}
+                      className="w-8 h-8 rounded-full"
+                    />
+                    <span>{row.name}</span>
                   </div>
+                </td>
+
+                <td className="p-3">{row.phone || "-"}</td>
+                <td className="p-3">{row.gender || "-"}</td>
+
+                <td className="p-3">
+                  <StatusBadge status={row.status} />
                 </td>
               </tr>
             ))}
@@ -132,27 +111,70 @@ const UserSection = ({ title, count, rows, nameLabel, statusLabel, defaultOpen =
 
 // ==================== Page ====================
 
-const Users = () => (
-  <DashboardLayout>
-    <div className="flex flex-col gap-5">
-      <UserSection
-        title="المتطوعون"
-        count={10}
-        rows={volunteers}
-        nameLabel="اسم المتطوع"
-        statusLabel="الحالة"
-        defaultOpen={false}
-      />
-      <UserSection
-        title="الباحثون"
-        count={3}
-        rows={seekers}
-        nameLabel="اسم الباحث"
-        statusLabel="الطلبات الحالية"
-        defaultOpen={true}
-      />
-    </div>
-  </DashboardLayout>
-);
+const Users = () => {
+  const { data, isLoading, isError } = useGetUsersQuery({});
+
+  if (isLoading) {
+    return (
+      <DashboardLayout>
+        <div className="h-screen flex items-center justify-center">
+          <Spinner className="h-10 w-10 animate-spin text-[#418FBF] " />
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  if (isError) {
+    return (
+      <DashboardLayout>
+        <div className="p-5 text-red-500">Failed to load users</div>
+      </DashboardLayout>
+    );
+  }
+
+  // ==================== Mapping API → UI ====================
+
+  const volunteers =
+    data?.volunteers?.map((u) => ({
+      _id: u._id,
+      name: u.fullName,
+      phone: u.phone,
+      gender: u.gender,
+      status: u.isEngaged ? "نشط" : "قيد الانتظار",
+      avatar: u.profileImg,
+    })) || [];
+
+  const seekers =
+    data?.patients?.map((u) => ({
+      _id: u._id,
+      name: u.fullName,
+      phone: u.phone,
+      gender: u.gender,
+      status: u.isEngaged ? "نشط" : "قيد الانتظار",
+      avatar: u.profileImg,
+    })) || [];
+
+  return (
+    <DashboardLayout>
+      <div className="flex flex-col gap-5">
+        <UserSection
+          title="المتطوعون"
+          count={volunteers.length}
+          rows={volunteers}
+          nameLabel="اسم المتطوع"
+          statusLabel="الحالة"
+        />
+
+        <UserSection
+          title="الباحثون"
+          count={seekers.length}
+          rows={seekers}
+          nameLabel="اسم الباحث"
+          statusLabel="الطلبات الحالية"
+        />
+      </div>
+    </DashboardLayout>
+  );
+};
 
 export default Users;
