@@ -1,19 +1,19 @@
+import DashboardLayout from "@/components/dashboard/DashboardLayout";
+import { Spinner } from "@/components/ui/spinner";
+import { useGetUsersQuery } from "@/redux/service/users/usersApi";
 import { useState } from "react";
 import { MdKeyboardArrowDown, MdKeyboardArrowUp } from "react-icons/md";
 import { RiSearchLine } from "react-icons/ri";
-import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import avatar from "../assets/avatar.png";
-import { useGetUsersQuery } from "@/redux/service/users/usersApi";
-import { Spinner } from "@/components/ui/spinner";
 
 // ==================== Helpers ====================
 
-const statusStyle = {
+const statusStyle: any = {
   نشط: "text-green-600 border-green-500",
   "قيد الانتظار": "text-orange-500 border-orange-400",
 };
 
-const StatusBadge = ({ status }) => (
+const StatusBadge = ({ status }: any) => (
   <span
     className={`px-6 py-1 rounded-full border text-sm font-medium ${
       statusStyle[status] || "text-gray-500 border-gray-300"
@@ -32,11 +32,13 @@ const UserSection = ({
   nameLabel,
   statusLabel,
   defaultOpen = true,
-}) => {
+}: any) => {
   const [open, setOpen] = useState(defaultOpen);
   const [search, setSearch] = useState("");
 
-  const filtered = rows.filter((r) => `${r.name} ${r.phone}`.includes(search));
+  const filtered = rows.filter((r: any) =>
+    `${r.name} ${r.phone}`.includes(search)
+  );
 
   return (
     <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
@@ -78,7 +80,7 @@ const UserSection = ({
           </thead>
 
           <tbody>
-            {filtered.map((row, i) => (
+            {filtered.map((row: any, i: any) => (
               <tr
                 key={row._id || i}
                 className={i % 2 ? "bg-gray-50" : "bg-white"}
@@ -112,7 +114,7 @@ const UserSection = ({
 // ==================== Page ====================
 
 const Users = () => {
-  const { data, isLoading, isError } = useGetUsersQuery({});
+  const { data, isLoading, isError }: any = useGetUsersQuery({});
 
   if (isLoading) {
     return (
@@ -135,7 +137,7 @@ const Users = () => {
   // ==================== Mapping API → UI ====================
 
   const volunteers =
-    data?.volunteers?.map((u) => ({
+    data?.volunteers?.map((u: any) => ({
       _id: u._id,
       name: u.fullName,
       phone: u.phone,
@@ -145,7 +147,7 @@ const Users = () => {
     })) || [];
 
   const seekers =
-    data?.patients?.map((u) => ({
+    data?.patients?.map((u: any) => ({
       _id: u._id,
       name: u.fullName,
       phone: u.phone,
