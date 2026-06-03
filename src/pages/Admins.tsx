@@ -2,6 +2,7 @@ import avatar from "@/assets/avatar.png";
 import CreateAdmin from "@/components/admins/CreateAdmin";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import { Spinner } from "@/components/ui/spinner";
+import EditUser from "@/components/users/EditUser";
 import { useGetAdminsQuery } from "@/redux/service/admins/adminsApi";
 import { useState } from "react";
 import { RiSearchLine } from "react-icons/ri";
@@ -10,6 +11,8 @@ const Admins = () => {
   const [search, setSearch] = useState("");
   const { data: admins, isLoading, isError } = useGetAdminsQuery({});
   const [openModal, setOpenModal] = useState(false);
+  const [openUserModal, setOpenUserModal] = useState(false);
+  const [userId, setUserId] = useState("");
 
   const filtered = admins?.allAdmins?.filter((a: any) =>
     `${a.name} ${a.phone} ${a.email}`.includes(search)
@@ -58,7 +61,6 @@ const Admins = () => {
               إضافة مدير جديد
             </button>
           </div>
-
           {/* Table */}
           <table className="w-full text-sm">
             <thead>
@@ -79,6 +81,10 @@ const Admins = () => {
               {filtered.map((row: any, i: any) => (
                 <tr
                   key={row._id ?? i}
+                  onClick={() => {
+                    setOpenUserModal(true);
+                    setUserId(row._id);
+                  }}
                   className="border-b last:border-0 hover:bg-gray-100 cursor-pointer transition-colors"
                 >
                   <td className="p-4">
@@ -112,6 +118,9 @@ const Admins = () => {
               handleCreateAdmin={handleCreateAdmin}
               setOpenModal={setOpenModal}
             />
+          )}
+          {openUserModal && (
+            <EditUser userId={userId} setOpenUserModal={setOpenUserModal} />
           )}
         </div>
       )}
