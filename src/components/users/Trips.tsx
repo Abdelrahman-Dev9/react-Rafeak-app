@@ -34,7 +34,7 @@ const statusConfig = {
   },
 };
 
-const Trips = ({ trips = mockTrips, onBlock }) => {
+const Trips = ({ trips = mockTrips, onBlock: any }) => {
   const [search, setSearch] = useState("");
 
   const filtered = trips.filter((t) =>
@@ -96,7 +96,7 @@ const Trips = ({ trips = mockTrips, onBlock }) => {
 
       {/* Trip Cards */}
       <div className="flex flex-col gap-4">
-        {filtered.map((trip, i) => {
+        {filtered.map((trip: any, i: any) => {
           const cfg = statusConfig[trip.status] ?? statusConfig.pending;
           const expanded = !!trip.requesterName;
 

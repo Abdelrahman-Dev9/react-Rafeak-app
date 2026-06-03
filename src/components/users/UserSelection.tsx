@@ -6,12 +6,12 @@ import UserDetails from "./UserDetails";
 
 // ==================== Helpers ====================
 
-const statusStyle = {
+const statusStyle: any = {
   نشط: "text-green-600 border-green-500",
   "قيد الانتظار": "text-orange-500 border-orange-400",
 };
 
-const StatusBadge = ({ status }) => (
+const StatusBadge = ({ status }: any) => (
   <span
     className={`px-6 py-1 rounded-full border text-sm font-medium ${
       statusStyle[status] || "text-gray-500 border-gray-300"
@@ -31,8 +31,7 @@ const UserSection = ({
 }: any) => {
   const [open, setOpen] = useState<boolean>(defaultOpen);
   const [search, setSearch] = useState("");
-  const [selectedRow, setSelectedRow] = useState(null);
-
+  const [selectedRow, setSelectedRow] = useState<any | null>(null);
   const filtered = (rows || []).filter((r: any) =>
     `${r.name} ${r.phone}`.includes(search)
   );

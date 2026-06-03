@@ -4,7 +4,17 @@ import { Spinner } from "../ui/spinner";
 import Trips from "./Trips";
 import UserInf from "./UserInf";
 
-const UserDetails = ({ selectedRow, setSelectedRow, userId }) => {
+interface UserDetailsProps {
+  selectedRow: any;
+  setSelectedRow: any;
+  userId: any;
+}
+
+const UserDetails = ({
+  selectedRow,
+  setSelectedRow,
+  userId,
+}: UserDetailsProps) => {
   const [activeTab, setActiveTab] = useState("info");
 
   const { data: user, isLoading } = useGetUserByIdQuery(userId);
