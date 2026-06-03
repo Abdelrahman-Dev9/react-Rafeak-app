@@ -1,9 +1,14 @@
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
+import ResearchersUsers from "@/components/reports/ResearchersUsers";
+import VolunteersUsers from "@/components/reports/VolunteersUsers";
 
-const Reports = () => (
-  <DashboardLayout>
-    <h1 className="text-2xl font-bold text-gray-700">التقارير</h1>
-  </DashboardLayout>
-);
+const Reports = () => {
+  return (
+    <DashboardLayout>
+      <VolunteersUsers />
+      <ResearchersUsers />
+    </DashboardLayout>
+  );
+};
 
 export default Reports;
