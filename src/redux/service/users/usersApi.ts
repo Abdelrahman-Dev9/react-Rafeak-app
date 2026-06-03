@@ -5,7 +5,13 @@ export const userApi = baseApi.injectEndpoints({
     getUsers: builder.query({
       query: () => "/admin/user",
     }),
+    getUserById: builder.query({
+      query: (id: string) => ({
+        url: `/admin/user/${id}`,
+        method: "GET",
+      }),
+    }),
   }),
 });
 
-export const { useGetUsersQuery } = userApi;
+export const { useGetUsersQuery, useGetUserByIdQuery } = userApi;

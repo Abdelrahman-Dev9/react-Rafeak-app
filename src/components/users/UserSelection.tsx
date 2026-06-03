@@ -6,12 +6,12 @@ import UserDetails from "./UserDetails";
 
 // ==================== Helpers ====================
 
-const statusStyle: any = {
+const statusStyle = {
   نشط: "text-green-600 border-green-500",
   "قيد الانتظار": "text-orange-500 border-orange-400",
 };
 
-const StatusBadge = ({ status }: any) => (
+const StatusBadge = ({ status }) => (
   <span
     className={`px-6 py-1 rounded-full border text-sm font-medium ${
       statusStyle[status] || "text-gray-500 border-gray-300"
@@ -82,7 +82,6 @@ const UserSection = ({
                 key={row._id || i}
                 onClick={() => {
                   setSelectedRow(row);
-                  console.log(row._id);
                 }}
                 className={
                   i % 2
@@ -115,6 +114,7 @@ const UserSection = ({
 
       {selectedRow && (
         <UserDetails
+          userId={selectedRow._id}
           selectedRow={selectedRow}
           setSelectedRow={setSelectedRow}
         />

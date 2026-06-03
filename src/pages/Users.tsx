@@ -4,7 +4,7 @@ import UserSection from "@/components/users/UserSelection";
 import { useGetUsersQuery } from "@/redux/service/users/usersApi";
 
 const Users = () => {
-  const { data, isLoading, isError }: any = useGetUsersQuery({});
+  const { data, isLoading, isError } = useGetUsersQuery({});
 
   if (isLoading) {
     return (

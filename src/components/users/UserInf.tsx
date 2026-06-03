@@ -1,12 +1,14 @@
+import { useGetUserByIdQuery } from "@/redux/service/users/usersApi";
 import { FaCalendar } from "react-icons/fa";
 import { ImBlocked } from "react-icons/im";
 import avatar from "../../assets/avatar.png";
 
 interface Props {
-  selectedRow: any;
+  userId: string;
 }
 
-const UserInf = ({ selectedRow }: Props) => {
+const UserInf = ({ userId }: Props) => {
+  const { data: user } = useGetUserByIdQuery(userId);
   return (
     <div dir="rtl">
       {/* Top row: fields + avatar */}
@@ -14,7 +16,7 @@ const UserInf = ({ selectedRow }: Props) => {
         {/* Avatar */}
         <div className=" border border-gray-200 rounded-xl  flex items-center justify-center p-4 ">
           <img
-            src={selectedRow.avatar ? selectedRow.avatar : avatar}
+            src={user?.user?.profileImg ? user?.user?.profileImg : avatar}
             alt="avatar"
             className="w-[95px] h-[100px] object-cover rounded-lg"
           />
@@ -29,7 +31,7 @@ const UserInf = ({ selectedRow }: Props) => {
                 الاسم الأول:
               </p>
               <p className="text-[14px] font-medium text-[#000000B2]">
-                {selectedRow.firstName ?? "مصطفى"}
+                {user?.user?.firstName ?? "مصطفى"}
               </p>
             </div>
 
@@ -38,7 +40,7 @@ const UserInf = ({ selectedRow }: Props) => {
                 اسم العائلة:
               </p>
               <p className="text-[14px] font-medium text-[#000000B2]">
-                {selectedRow.lastName ?? "محمد"}
+                {user?.user?.lastName ?? "محمد"}
               </p>
             </div>
           </div>
@@ -50,7 +52,7 @@ const UserInf = ({ selectedRow }: Props) => {
                 هاتف المستخدم:
               </p>
               <p className="text-[14px] font-medium text-[#000000B2]">
-                {selectedRow.phone ?? "+966 12345678"}
+                {user?.user?.phone ?? "+966 12345678"}
               </p>
             </div>
 
@@ -60,7 +62,7 @@ const UserInf = ({ selectedRow }: Props) => {
                 الجنس:
               </p>
               <p className="text-[14px] font-medium text-[#000000B2]">
-                {selectedRow.gender ?? "ذكر"}
+                {user?.user?.gender ?? "ذكر"}
               </p>
             </div>
           </div>
@@ -74,7 +76,7 @@ const UserInf = ({ selectedRow }: Props) => {
             تاريخ الميلاد
           </p>
           <p className="text-[14px] font-semibold text-[#000000B2]">
-            {selectedRow.birthDate ?? "10/30/2024"}
+            {user?.user?.birthday?.split("T")[0] ?? "10/30/2024"}
           </p>
         </div>
         <FaCalendar />
@@ -86,7 +88,7 @@ const UserInf = ({ selectedRow }: Props) => {
           البريد الإلكتروني
         </p>
         <p className="text-[14px] font-semibold text-[#000000B2] mb-1">
-          {selectedRow.email ?? "Mostafa@gmail.com"}
+          {user?.user?.email ?? "Mostafa@gmail.com"}
         </p>
       </div>
 
