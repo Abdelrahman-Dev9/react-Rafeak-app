@@ -76,7 +76,7 @@ const Admins = () => {
             </thead>
 
             <tbody>
-              {filtered.map(({ row, i }: any) => (
+              {filtered.map((row: any, i: any) => (
                 <tr
                   key={row._id ?? i}
                   className="border-b last:border-0 hover:bg-gray-100 cursor-pointer transition-colors"
