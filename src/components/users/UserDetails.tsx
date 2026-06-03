@@ -85,7 +85,10 @@ const UserDetails = ({
 
             {/* Trips Panel */}
             {activeTab === "trips" && (
-              <Trips trips={selectedRow?.trips} onBlock />
+              <Trips
+                trips={selectedRow?.trips}
+                onBlock={() => setSelectedRow(null)}
+              />
             )}
           </>
         )}

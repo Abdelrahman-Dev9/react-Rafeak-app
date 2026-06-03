@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+// ==================== Mock Data ====================
 const mockTrips = [
   {
     id: "29312BA",
@@ -19,9 +20,35 @@ const mockTrips = [
     injury: null,
     helpType: null,
   },
-];
+] as const;
 
-const statusConfig = {
+// ==================== Types ====================
+type TripStatus = "pending" | "completed";
+
+type Trip = {
+  id: string;
+  date: string;
+  status: TripStatus;
+  requesterName: string | null;
+  requesterPhone: string | null;
+  injury: string | null;
+  helpType: string | null;
+};
+
+type Props = {
+  trips?: Trip[];
+  onBlock?: () => void;
+};
+
+// ==================== Status Config ====================
+const statusConfig: Record<
+  TripStatus,
+  {
+    label: string;
+    border: string;
+    text: string;
+  }
+> = {
   pending: {
     label: "قيد التنفيذ",
     border: "border-blue-400",
@@ -34,8 +61,9 @@ const statusConfig = {
   },
 };
 
-const Trips = ({ trips = mockTrips, onBlock: any }) => {
-  const [search, setSearch] = useState("");
+// ==================== Component ====================
+const Trips = ({ trips = mockTrips as unknown as Trip[], onBlock }: Props) => {
+  const [search, setSearch] = useState<string>("");
 
   const filtered = trips.filter((t) =>
     t.id.toLowerCase().includes(search.toLowerCase())
@@ -81,6 +109,7 @@ const Trips = ({ trips = mockTrips, onBlock: any }) => {
             <circle cx="11" cy="11" r="7" />
             <line x1="16.5" y1="16.5" x2="22" y2="22" />
           </svg>
+
           <input
             type="text"
             placeholder="ابحث عن الكود"
@@ -91,13 +120,12 @@ const Trips = ({ trips = mockTrips, onBlock: any }) => {
         </div>
       </div>
 
-      {/* Divider */}
       <hr className="border-gray-100 mb-4" />
 
       {/* Trip Cards */}
       <div className="flex flex-col gap-4">
-        {filtered.map((trip: any, i: any) => {
-          const cfg = statusConfig[trip.status] ?? statusConfig.pending;
+        {filtered.map((trip, i) => {
+          const cfg = statusConfig[trip.status];
           const expanded = !!trip.requesterName;
 
           return (
@@ -105,16 +133,14 @@ const Trips = ({ trips = mockTrips, onBlock: any }) => {
               key={i}
               className="border border-gray-200 rounded-2xl overflow-hidden bg-white"
             >
-              {/* Card Header */}
+              {/* Header */}
               <div className="flex items-start justify-between px-5 pt-4 pb-3">
-                {/* Status badge */}
                 <button
                   className={`border ${cfg.border} ${cfg.text} rounded-full px-8 py-2 text-sm font-medium bg-white hover:bg-gray-50 transition min-w-[160px]`}
                 >
                   {cfg.label}
                 </button>
 
-                {/* ID + Date */}
                 <div className="text-right">
                   <p className="text-base font-semibold text-gray-800">
                     ID #{trip.id}
@@ -123,19 +149,17 @@ const Trips = ({ trips = mockTrips, onBlock: any }) => {
                 </div>
               </div>
 
-              {/* Expanded details */}
+              {/* Expanded */}
               {expanded && (
                 <>
                   <hr className="border-gray-100 mx-5" />
                   <div className="px-5 py-4 grid grid-cols-2 gap-x-8 gap-y-4">
-                    {/* Section title */}
                     <div className="col-span-2 text-right">
                       <p className="text-base font-semibold text-gray-800">
                         معلومات الطلب
                       </p>
                     </div>
 
-                    {/* Right col */}
                     <div className="text-right">
                       <p className="text-sm font-bold text-gray-800 mb-1">
                         اسم الباحث
@@ -145,7 +169,6 @@ const Trips = ({ trips = mockTrips, onBlock: any }) => {
                       </p>
                     </div>
 
-                    {/* Left col */}
                     <div className="text-right">
                       <p className="text-sm font-bold text-gray-800 mb-1">
                         هاتف الباحث
@@ -155,7 +178,6 @@ const Trips = ({ trips = mockTrips, onBlock: any }) => {
                       </p>
                     </div>
 
-                    {/* Injury */}
                     <div className="col-span-2 text-right">
                       <p className="text-sm font-bold text-gray-800 mb-1">
                         إصابة
@@ -163,7 +185,6 @@ const Trips = ({ trips = mockTrips, onBlock: any }) => {
                       <p className="text-sm text-gray-600">{trip.injury}</p>
                     </div>
 
-                    {/* Help type */}
                     <div className="col-span-2 text-right">
                       <p className="text-sm font-bold text-gray-800 mb-1">
                         نوع المساعدة؟
@@ -178,7 +199,7 @@ const Trips = ({ trips = mockTrips, onBlock: any }) => {
         })}
       </div>
 
-      {/* Block user button */}
+      {/* Block Button */}
       <div className="flex justify-start mt-8">
         <button
           onClick={onBlock}
