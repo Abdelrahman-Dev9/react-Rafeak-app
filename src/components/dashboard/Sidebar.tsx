@@ -93,7 +93,10 @@ const Sidebar = ({ isOpen, toggleSidebar }: SidebarProps) => {
       {/* Footer */}
       <div className="absolute bottom-0 w-full border-t border-gray-100 p-3">
         <button
-          onClick={() => navigate("/login")}
+          onClick={() => {
+            localStorage.removeItem("token"); // or your key name
+            navigate("/login");
+          }}
           className={`w-full flex items-center ${
             isOpen ? "gap-2" : "justify-center"
           } text-[#418FBF] cursor-pointer`}
@@ -101,7 +104,6 @@ const Sidebar = ({ isOpen, toggleSidebar }: SidebarProps) => {
           <MdLogout size={20} />
           {isOpen && <span>تسجيل الخروج</span>}
         </button>
-
         {isOpen && (
           <div className="flex items-center gap-2 mt-4">
             <img src={avatar} alt="avatar" />
