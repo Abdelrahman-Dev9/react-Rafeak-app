@@ -105,7 +105,10 @@ const Sidebar = ({ isOpen, toggleSidebar }: SidebarProps) => {
           {isOpen && <span>تسجيل الخروج</span>}
         </button>
         {isOpen && (
-          <div className="flex items-center gap-2 mt-4">
+          <div
+            onClick={() => navigate("/profile")}
+            className="flex items-center gap-2 mt-4"
+          >
             <img src={avatar} alt="avatar" />
             <div>
               <p className="text-xs text-gray-400">مرحبا بعودتك 👋</p>

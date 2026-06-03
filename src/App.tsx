@@ -9,6 +9,7 @@ import Admins from "./pages/Admins";
 import Notifications from "./pages/Notifications";
 import Reports from "./pages/Reports";
 import CreateNewPassword from "./pages/auth/CreateNewPassword";
+import Profile from "./pages/Profile";
 
 const App = () => {
   return (
@@ -24,6 +25,7 @@ const App = () => {
         <Route path="/admins" element={<Admins />} />
         <Route path="/notifications" element={<Notifications />} />
         <Route path="/reports" element={<Reports />} />
+        <Route path="/profile" element={<Profile />} />
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </BrowserRouter>
