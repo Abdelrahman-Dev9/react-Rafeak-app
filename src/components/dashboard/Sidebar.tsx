@@ -1,3 +1,9 @@
+import { useGetAdminsQuery } from "@/redux/service/admins/adminsApi";
+import { useGetNotificationsQuery } from "@/redux/service/notifications/notificationsApi";
+import { useGetAdminProfileQuery } from "@/redux/service/profile/profileApi";
+import { useGetReportsQuery } from "@/redux/service/reports/reportsApi";
+import { useGetOrdersQuery } from "@/redux/service/TrakingList/trackinglistApi";
+import { useGetUsersQuery } from "@/redux/service/users/usersApi";
 import {
   MdBarChart,
   MdBookmarks,
@@ -13,20 +19,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 import avatar from "../../assets/avatar.png";
 import logo from "../../assets/logo.png";
 
-const navItems = [
-  { label: "لوحة التحكم", icon: MdDashboard, badge: null, path: "/dashboard" },
-  { label: "قائمة التتبع", icon: MdBookmarks, badge: 5, path: "/tracking" },
-  { label: "المستخدمون", icon: MdPeople, badge: 45, path: "/users" },
-  { label: "المديرون", icon: MdSupervisorAccount, badge: 10, path: "/admins" },
-  {
-    label: "الإشعارات",
-    icon: MdNotifications,
-    badge: 3,
-    path: "/notifications",
-  },
-  { label: "التقارير", icon: MdBarChart, badge: null, path: "/reports" },
-];
-
 interface SidebarProps {
   isOpen: boolean;
   toggleSidebar: () => void;
@@ -35,6 +27,53 @@ interface SidebarProps {
 const Sidebar = ({ isOpen, toggleSidebar }: SidebarProps) => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const { data: orders } = useGetOrdersQuery({});
+  const { data: users } = useGetUsersQuery({});
+  const { data: admins } = useGetAdminsQuery({});
+  const { data: notifications } = useGetNotificationsQuery({});
+  const { data: reports } = useGetReportsQuery({});
+  const { data: profile } = useGetAdminProfileQuery({});
+  // console.log(reports);
+  console.log();
+
+  const navItems = [
+    {
+      label: "لوحة التحكم",
+      icon: MdDashboard,
+      badge: null,
+      path: "/dashboard",
+    },
+    {
+      label: "قائمة التتبع",
+      icon: MdBookmarks,
+      badge: orders?.orders?.length,
+      path: "/tracking",
+    },
+    {
+      label: "المستخدمون",
+      icon: MdPeople,
+      badge: users?.volunteers?.length + users?.patients?.length,
+      path: "/users",
+    },
+    {
+      label: "المديرون",
+      icon: MdSupervisorAccount,
+      badge: admins?.allAdmins?.length,
+      path: "/admins",
+    },
+    {
+      label: "الإشعارات",
+      icon: MdNotifications,
+      badge: notifications?.data?.length,
+      path: "/notifications",
+    },
+    {
+      label: "التقارير",
+      icon: MdBarChart,
+      badge: reports?.volunteers?.length + reports?.researchers?.length,
+      path: "/reports",
+    },
+  ];
 
   return (
     <aside
@@ -112,7 +151,9 @@ const Sidebar = ({ isOpen, toggleSidebar }: SidebarProps) => {
             <img src={avatar} alt="avatar" />
             <div>
               <p className="text-xs text-gray-400">مرحبا بعودتك 👋</p>
-              <p className="text-xs font-semibold">محمد عبد العاطي</p>
+              <p className="text-xs font-semibold">
+                {profile?.admin.firstName + " " + profile?.admin.lastName}
+              </p>
             </div>
           </div>
         )}
